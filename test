@@ -1,4 +1,43 @@
- https://drive.google.com/file/d/1bO5YFk9hbmazqR447_WpC6t1oKZxyAAP/view?usp=sharing<launch>
+
+
+<launch>
+    <!-- Spawn the leader turtle -->
+    <node pkg="turtlesim" type="turtlesim_node" name="turtle_leader" respawn="false" output="screen"/>
+
+    <!-- Spawn the follower turtles -->
+    <node pkg="turtlesim" type="turtlesim_node" name="turtle_follower1" respawn="false" output="screen">
+        <param name="x" value="1.0"/>   <!-- Set the X position of the first follower -->
+        <param name="y" value="5.5"/>   <!-- Set the Y position of the first follower -->
+        <param name="theta" value="0"/> <!-- Set the initial orientation of the first follower -->
+    </node>
+
+    <node pkg="turtlesim" type="turtlesim_node" name="turtle_follower2" respawn="false" output="screen">
+        <param name="x" value="2.0"/>   <!-- Set the X position of the second follower -->
+        <param name="y" value="5.5"/>   <!-- Set the Y position of the second follower -->
+        <param name="theta" value="0"/> <!-- Set the initial orientation of the second follower -->
+    </node>
+</launch>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+https://drive.google.com/file/d/1bO5YFk9hbmazqR447_WpC6t1oKZxyAAP/view?usp=sharing<launch>
       <node pkg="turtlesim" type="turtlesim_node" name="sim"/>
       <!-- <node pkg="turtlesim" type="turtle_teleop_key" name="teleop" output="screen"/> -->
 
