@@ -1,0 +1,332 @@
+ <launch>
+      <node pkg="turtlesim" type="turtlesim_node" name="sim"/>
+      <!-- <node pkg="turtlesim" type="turtle_teleop_key" name="teleop" output="screen"/> -->
+
+
+    <node name="turtle1_tf2_broadcaster" pkg="com760_week5_ws_pkg" type="turtle_tf2_broadcaster.py" respawn="false" output="screen" >
+      <param name="turtle" type="string" value="turtle1" />
+    </node>
+    <node name="turtle2_tf2_broadcaster" pkg="com760_week5_ws_pkg" type="turtle_tf2_broadcaster.py" respawn="false" output="screen" >
+      <param name="turtle" type="string" value="turtle2" /> 
+    </node>
+    
+    <node name="turtle3_tf2_broadcaster" pkg="com760_week5_ws_pkg" type="turtle_tf2_broadcaster.py" respawn="false" output="screen" >
+      <param name="turtle" type="string" value="turtle3" /> 
+    </node>
+    
+    <node name="turtle4_tf2_broadcaster" pkg="com760_week5_ws_pkg" type="turtle_tf2_broadcaster.py" respawn="false" output="screen" >
+      <param name="turtle" type="string" value="turtle4" /> 
+    </node>
+    
+    
+    
+    
+    <node pkg="com760_week5_ws_pkg" type="turtle_tf2_listener.py" name="listener" output="screen"/>
+    
+    <node pkg="com760_week5_ws_pkg" type="fixed_tf2_broadcaster.py" name="broadcaster_fixed" output="screen"/>
+    <node pkg="com760_week5_ws_pkg" type="fixed_tf2_broadcaster_1.py" name="broadcaster_fixed_1" output="screen"/>
+    <node pkg="com760_week5_ws_pkg" type="fixed_tf2_broadcaster_2.py" name="broadcaster_fixed_2" output="screen"/>
+    
+    <!-- <node pkg="com760_week5_ws_pkg" type="dynamic_tf2_broadcaster.py" name="broadcaster_dynamic" output="screen"/> -->
+
+  </launch>
+
+
+
+
+#!/usr/bin/env python  
+import rospy
+
+import math
+import tf2_ros
+import geometry_msgs.msg
+import turtlesim.srv
+from turtlesim.msg import Pose
+from geometry_msgs.msg import Twist
+import time
+from random import randint
+from com760_assign_summer_ws_pkg.msg import bxxxxxxxxLeaderMessage
+
+# name = ""
+instruction = ""
+message = ""
+f2x = None
+
+global PI, x, y, x, yaw
+PI = 3.1415926535897
+x=0
+y=0
+z=0
+yaw=0
+tolerance = 0.1
+condition = 0
+
+def callback(data):
+    global instruction, message
+    instruction = data.instructionID
+    message = data.message
+    # print("Instruction is: ", data.instructionID)
+    # return data
+
+def msg_listener():
+    # global data
+    # print("In listener")
+    # rospy.Subscriber('leader_chatter', bxxxxxxxxLeaderMessage, callback)
+    # print(data)
+    pass
+
+def msg_talker():
+    # print("In talker")
+    # sg_pub = rospy.Publisher('leader_chatter', bxxxxxxxxLeaderMessage, queue_size=10)
+
+    msg = b00830189LeaderMessage()
+    msg.instructionID = 0
+    msg.message = "Followers are to gather in formation"
+    msg_pub.publish(msg) # The message is cintinuously published
+    msg_listener()
+
+def rotate():
+    #Starts a new node
+    # rospy.init_node('robot_cleaner', anonymous=True)
+    # velocity_publisher = rospy.Publisher('/leader_turtle/cmd_vel', Twist, queue_size=10)
+    # vel_msg = Twist()
+
+    speed = 90.0
+    angle = 90.0
+    
+    
+    clockwise = randint(0,1) # 0 = False, so, antilockwise, 1 - True, so, clockwise
+    # clockwise = False
+
+    #Converting from angles to radians
+    angular_speed = speed*2*PI/360
+    relative_angle = angle*2*PI/360
+
+    #We wont use linear components
+    vel.linear.x=0
+    vel.linear.y=0
+    vel.linear.z=0
+    vel.angular.x = 0
+    vel.angular.y = 0
+
+
+    # Checking if our movement is CW or CCW
+    if clockwise:
+        vel.angular.z = -abs(angular_speed)
+    else:
+        vel.angular.z = abs(angular_speed)
+    # Setting the current time for distance calculus
+    t0 = rospy.Time.now().to_sec()
+    current_angle = 0
+
+
+    while(current_angle < relative_angle):
+        # rospy.loginfo("Rotating")
+        pub.publish(vel)
+        t1 = rospy.Time.now().to_sec()
+        current_angle = angular_speed*(t1-t0)
+
+
+    #Forcing stop
+    vel.angular.z = 0
+    pub.publish(vel)
+    # rospy.spin()
+
+
+def poseCallback(pose_message):
+    global x
+    global y, z, yaw
+    x= pose_message.x
+    y= pose_message.y
+    yaw = pose_message.theta
+    
+
+def f1_poseCallback(f1_pose_message):
+    # Function to get the polition of the follower 1 turtle
+    global f1x, f1y, f1z, f1yaw
+    f1x= f1_pose_message.x
+    f1y= f1_pose_message.y
+    f1yaw = f1_pose_message.theta
+  
+def f2_poseCallback(f2_pose_message):
+    # Function to get the polition of the follower 2 turtle
+    global f2x, f2y, f2z, f2yaw
+    f2x= f2_pose_message.x
+    f2y= f2_pose_message.y
+    f2yaw = f2_pose_message.theta
+  
+def f3_poseCallback(f3_pose_message):
+    # Function to get the polition of the follower 3 turtle
+    global f3x, f3y, f3z, f3yaw
+    f3x= f3_pose_message.x
+    f3y= f3_pose_message.y
+    f3yaw = f3_pose_message.theta
+
+def pose_callback(pose):
+    global robot_x
+    rospy.loginfo("Robot X = %f : Y = %f : Z = %f \n", pose.x, pose.y, pose.theta)
+    robot_x = pose.x
+
+def straight_line_setup():
+    # --- Moves the turtle in a straight line after it has rotated --- #
+    vel.linear.x = 0.5 # Speed
+    vel.linear.y = 0
+    vel.linear.z = 0
+    
+    vel.angular.x = 0
+    vel.angular.y = 0
+    vel.angular.z = 0
+
+
+if __name__ == '__main__':
+    global vel, pub
+    rospy.init_node('tf2_turtle_listener')
+    
+    rospy.Subscriber('leader_chatter', b00830189LeaderMessage, callback)
+    msg_pub = rospy.Publisher('leader_chatter', b00830189LeaderMessage, queue_size=10)
+    
+    loop_rate = rospy.Rate(10) # Publishing 10Hz
+    
+    turtlename = 'turtle1'
+    position_topic = "/turtle1/pose"
+    pose_subscriber = rospy.Subscriber(position_topic, Pose, poseCallback)
+    
+    follow1_topic = "/turtle2/pose"
+    follower1_subscriber = rospy.Subscriber(follow1_topic, Pose, f1_poseCallback)
+    follow2_topic = "/turtle3/pose"
+    follower1_subscriber = rospy.Subscriber(follow2_topic, Pose, f3_poseCallback)
+    follow3_topic = "/turtle4/pose"
+    follower1_subscriber = rospy.Subscriber(follow3_topic, Pose, f3_poseCallback)
+    
+    
+    x0=x #  x0 - starts point
+    y0=y
+    distance_moved = 0.0
+    
+    vel = Twist()
+
+    pub = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
+    # rospy.Subscriber('/turtle1/pose', Pose, pose_callback)
+    
+    time.sleep(5) # Allowing time for everything to get set up before next thing happens
+    
+    # ------- Rotating, hopefully ------ ~
+    rotate() # This function will go off and rotate the turtle either closewise or anticlockwise.
+    
+    time.sleep(3)
+    # --- Moves the turtle in a straight line after it has rotated --- #
+    straight_line_setup() # call this instead of the commented code above
+
+    tfBuffer = tf2_ros.Buffer()
+    listener = tf2_ros.TransformListener(tfBuffer)
+    
+    
+    # ----------------- Spawning turtles ------------------ #
+    rospy.wait_for_service('spawn')
+    spawner = rospy.ServiceProxy('spawn', turtlesim.srv.Spawn)
+    turtle_name_2 = rospy.get_param('turtle', 'turtle2')
+    # spawner(randint(2,7), randint(1,9), 0, turtle_name_2)
+    spawner(1, 1, 0, turtle_name_2)
+
+    rospy.wait_for_service('spawn')
+    spawner = rospy.ServiceProxy('spawn', turtlesim.srv.Spawn)
+    turtle_name_3 = rospy.get_param('turtle', 'turtle3')
+    # spawner(randint(7,9), randint(1,9), 0, turtle_name_3)
+    spawner(1, 4, 0, turtle_name_3)
+    
+    rospy.wait_for_service('spawn')
+    spawner = rospy.ServiceProxy('spawn', turtlesim.srv.Spawn)
+    turtle_name_4 = rospy.get_param('turtle', 'turtle4')
+    spawner(1, 8, 0, turtle_name_4)
+
+    turtle_vel_2 = rospy.Publisher('%s/cmd_vel' % turtle_name_2, geometry_msgs.msg.Twist, queue_size=1)
+    turtle_vel_3 = rospy.Publisher('%s/cmd_vel' % turtle_name_3, geometry_msgs.msg.Twist, queue_size=1)
+    turtle_vel_4 = rospy.Publisher('%s/cmd_vel' % turtle_name_4, geometry_msgs.msg.Twist, queue_size=1)
+
+    rate = rospy.Rate(10.0)
+    while not rospy.is_shutdown():
+        
+        msg_talker()
+        
+        # Now, I want an if-statement. If 0, for the followers, if 0, do the other thing
+        if(instruction == 0):
+        # pub.publish(vel) # publishing to leader turtle (i.e. main turtle)
+            try:
+                past = rospy.Time.now() - rospy.Duration(5.0)
+
+                trans2 = tfBuffer.lookup_transform(turtle_name_2, 'carrot1', rospy.Time.now(), rospy.Duration(1.0))
+                trans3 = tfBuffer.lookup_transform(turtle_name_3, 'carrot2', rospy.Time.now(), rospy.Duration(1.0))
+                trans4 = tfBuffer.lookup_transform(turtle_name_4, 'carrot3', rospy.Time.now(), rospy.Duration(1.0))
+                # trans3 = tfBuffer.lookup_transform('turtle3', 'carrot2', rospy.Time.now(), rospy.Duration(1.0))
+            except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                # raise
+                rate.sleep()
+                continue
+
+            msg2 = geometry_msgs.msg.Twist()
+            msg2.angular.z = 4 * math.atan2(trans2.transform.translation.y, trans2.transform.translation.x)
+            msg2.linear.x = 0.5 * math.sqrt(trans2.transform.translation.x ** 2 + trans2.transform.translation.y ** 2)
+            
+            msg3 = geometry_msgs.msg.Twist()
+            msg3.angular.z = 4 * math.atan2(trans3.transform.translation.y, trans3.transform.translation.x)
+            msg3.linear.x = 0.5 * math.sqrt(trans3.transform.translation.x ** 2 + trans3.transform.translation.y ** 2)
+            
+            msg4 = geometry_msgs.msg.Twist()
+            msg4.angular.z = 4 * math.atan2(trans4.transform.translation.y, trans4.transform.translation.x)
+            msg4.linear.x = 0.5 * math.sqrt(trans4.transform.translation.x ** 2 + trans4.transform.translation.y ** 2)
+            
+            turtle_vel_2.publish(msg2)
+            turtle_vel_3.publish(msg3)
+            turtle_vel_4.publish(msg4)
+
+            pub.publish(vel) # Moves the leader turtle
+            
+            if(((x > 10.5) or (x < 0.5)) or ((y > 10.5) or (y < 0.5))):
+                print("Ah!! A wall")
+                vel.linear.x = 0
+                vel.linear.y = 0
+                pub.publish(vel)
+        else:
+            # print("It isn't 0, you crazy fool!")
+            pass
+
+        rate.sleep()
+Then I also have the following, in separate files. The only difference is the t.child_frame_id is different in all three. The other two have carrot2 and then carrot3, and the x- and y-locations:
+
+#!/usr/bin/env python  
+import rospy
+import tf2_ros
+import tf2_msgs.msg
+import geometry_msgs.msg
+
+
+class FixedTFBroadcaster:
+
+    def __init__(self):
+        self.pub_tf = rospy.Publisher("/tf", tf2_msgs.msg.TFMessage, queue_size=1)
+
+        while not rospy.is_shutdown():
+            # Run this loop at about 10Hz
+            rospy.sleep(0.1)
+
+            t = geometry_msgs.msg.TransformStamped()
+            t.header.frame_id = "turtle1"
+            t.header.stamp = rospy.Time.now()
+            t.child_frame_id = "carrot1"
+            t.transform.translation.x = -1.0
+            t.transform.translation.y = -1.0
+            t.transform.translation.z = 0.0
+
+            t.transform.rotation.x = 0.0
+            t.transform.rotation.y = 0.0
+            t.transform.rotation.z = 0.0
+            t.transform.rotation.w = 1.0
+
+            tfm = tf2_msgs.msg.TFMessage([t])
+            self.pub_tf.publish(tfm)
+
+if __name__ == '__main__':
+    rospy.init_node('fixed_tf2_broadcaster')
+    tfb = FixedTFBroadcaster()
+
+    rospy.spin()
