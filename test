@@ -1,4 +1,22 @@
+<launch>
+    <!-- Spawn the turtlesim node -->
+    <node pkg="turtlesim" type="turtlesim_node" name="turtlesim" respawn="false" output="screen"/>
 
+    <!-- Spawn the leader turtle -->
+    <node pkg="turtlesim" type="turtle_teleop_key" name="leader_teleop" respawn="false" output="screen">
+        <remap from="turtle1/cmd_vel" to="leader/cmd_vel"/>
+    </node>
+
+    <!-- Spawn the follower turtles -->
+    <node pkg="turtlesim" type="turtle_teleop_key" name="follower1_teleop" respawn="false" output="screen">
+        <remap from="turtle1/cmd_vel" to="follower1/cmd_vel"/>
+    </node>
+
+    <node pkg="turtlesim" type="turtle_teleop_key" name="follower2_teleop" respawn="false" output="screen">
+        <remap from="turtle1/cmd_vel" to="follower2/cmd_vel"/>
+    </node>
+</launch>
+ 2
 
 <launch>
     <!-- Spawn the leader turtle -->
