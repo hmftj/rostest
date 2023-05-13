@@ -1,3 +1,24 @@
+test
+<launch>
+    <!-- Spawn the turtlesim node -->
+    <node pkg="turtlesim" type="turtlesim_node" name="turtlesim" respawn="false" output="screen" />
+
+    <!-- Spawn the leader turtle -->
+    <node pkg="turtlesim" type="spawn" name="spawn_leader" output="screen"
+          args="leader 2 2 0" />
+
+    <!-- Spawn the follower turtles -->
+    <node pkg="turtlesim" type="spawn" name="spawn_follower1" output="screen"
+          args="follower1 1 2 0" />
+
+    <node pkg="turtlesim" type="spawn" name="spawn_follower2" output="screen"
+          args="follower2 3 2 0" />
+</launch>
+
+
+//end
+
+
 <launch>
     <!-- Spawn the turtlesim node -->
     <node pkg="turtlesim" type="turtlesim_node" name="turtlesim" respawn="false" output="screen"/>
